@@ -39,20 +39,21 @@ services:
       - order-network
     restart: unless-stopped
 
-  discord-bot:
-    build: ./discord-bot
-    container_name: order-discord-bot
-    environment:
-      DISCORD_TOKEN: ${DISCORD_TOKEN}
-      CLIENT_ID: ${CLIENT_ID}
-      BACKEND_API_URL: http://backend:3000
-      SWISH_NUMBER: ${SWISH_NUMBER}
-      PAYPAL_LINK: ${PAYPAL_LINK}
-    depends_on:
-      - backend
-    networks:
-      - order-network
-    restart: unless-stopped
+# Discord bot runs separately - see https://github.com/OfficialBabyboidaniel/OrderBot
+  # discord-bot:
+  #   build: ./discord-bot
+  #   container_name: order-discord-bot
+  #   environment:
+  #     DISCORD_TOKEN: ${DISCORD_TOKEN}
+  #     CLIENT_ID: ${CLIENT_ID}
+  #     BACKEND_API_URL: http://backend:3000
+  #     SWISH_NUMBER: ${SWISH_NUMBER}
+  #     PAYPAL_LINK: ${PAYPAL_LINK}
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - order-network
+  #   restart: unless-stopped
 
 volumes:
   postgres_data:
