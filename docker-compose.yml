@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: order-postgres
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_USER: orderuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - order-network
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: order-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: orders
+      DB_USER: orderuser
+      DB_PASSWORD: ${DB_PASSWORD}
+      GOOGLE_SHEET_ID: ${GOOGLE_SHEET_ID}
+      GOOGLE_SERVICE_ACCOUNT_KEY: /app/service-account.json
+      PORT: 3000
+    volumes:
+      - ./backend/service-account.json:/app/service-account.json:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - order-network
+    restart: unless-stopped
+
+  discord-bot:
+    build: ./discord-bot
+    container_name: order-discord-bot
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      CLIENT_ID: ${CLIENT_ID}
+      BACKEND_API_URL: http://backend:3000
+      SWISH_NUMBER: ${SWISH_NUMBER}
+      PAYPAL_LINK: ${PAYPAL_LINK}
+    depends_on:
+      - backend
+    networks:
+      - order-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  order-network:
+    driver: bridge
