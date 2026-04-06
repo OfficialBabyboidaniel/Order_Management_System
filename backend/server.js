@@ -27,14 +27,14 @@ setInterval(async () => {
 }, BATCH_INTERVAL);
 
 app.post('/api/orders', async (req, res) => {
-  const { order_id, game_name, steam_price, customer_price, steam_name, payment_method, discord_user_id, discord_username, status } = req.body;
+  const { order_id, discord_username, payment_method, referral_code, discord_user_id, status } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO orders (order_id, game_name, current_price, steam_name, payment_method, user_id, username, status, thread_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO orders (order_id, discord_username, payment_method, referral_code, user_id, username, status, thread_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [order_id, game_name, steam_price, steam_name, payment_method, discord_user_id, discord_username, status, null]
+      [order_id, discord_username, payment_method, referral_code || null, discord_user_id, discord_username, status, null]
     );
 
     pendingOrders.push(result.rows[0]);

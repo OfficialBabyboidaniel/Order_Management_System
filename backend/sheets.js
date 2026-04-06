@@ -28,18 +28,16 @@ async function syncToSheets(orders) {
     
     const values = orders.map(order => [
       order.order_id,
-      order.game_name,
-      order.current_price,
-      order.steam_name,
+      order.discord_username,
       order.payment_method,
-      order.username,
+      order.referral_code || '',
       order.status,
       new Date(order.created_at).toISOString()
     ]);
 
     await api.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Orders!A:H',
+      range: 'Orders!A:F',
       valueInputOption: 'USER_ENTERED',
       resource: { values }
     });
