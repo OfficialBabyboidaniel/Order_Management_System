@@ -46,6 +46,22 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
+app.put('/api/orders/:id', async (req, res) => {
+  const { status, notes, mod_verified } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE orders SET status = $1, mod_verified = COALESCE($2, mod_verified), updated_at = NOW() WHERE id = $3 RETURNING *`,
+      [status, mod_verified ?? null, req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Order not found' });
+    pendingOrders.push(result.rows[0]);
+    res.json({ success: true, order: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/orders', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');

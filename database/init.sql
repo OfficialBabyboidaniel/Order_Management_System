@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS orders (
     user_id VARCHAR(50) NOT NULL,
     username VARCHAR(100) NOT NULL,
     status VARCHAR(50) DEFAULT 'pending',
-    thread_id VARCHAR(50),
+    mod_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

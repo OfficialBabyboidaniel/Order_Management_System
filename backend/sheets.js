@@ -25,22 +25,43 @@ async function syncToSheets(orders) {
 
   try {
     const api = await initSheets();
-    
-    const values = orders.map(order => [
-      order.order_id,
-      order.discord_username,
-      order.payment_method,
-      order.referral_code || '',
-      order.status,
-      new Date(order.created_at).toISOString()
-    ]);
 
-    await api.spreadsheets.values.append({
-      spreadsheetId,
-      range: 'Orders!A:F',
-      valueInputOption: 'USER_ENTERED',
-      resource: { values }
-    });
+    for (const order of orders) {
+      // Check if row already exists
+      const existing = await api.spreadsheets.values.get({
+        spreadsheetId,
+        range: 'Orders!A:A'
+      });
+
+      const rows = existing.data.values || [];
+      const rowIndex = rows.findIndex(r => r[0] === order.order_id);
+
+      if (rowIndex > 0) {
+        // Update existing row's status and mod_verified columns only
+        await api.spreadsheets.values.update({
+          spreadsheetId,
+          range: `Orders!E${rowIndex + 1}:F${rowIndex + 1}`,
+          valueInputOption: 'USER_ENTERED',
+          resource: { values: [[order.status, order.mod_verified ? 'Ja' : 'Nej']] }
+        });
+      } else {
+        // Append new row
+        await api.spreadsheets.values.append({
+          spreadsheetId,
+          range: 'Orders!A:G',
+          valueInputOption: 'USER_ENTERED',
+          resource: { values: [[
+            order.order_id,
+            order.discord_username,
+            order.payment_method,
+            order.referral_code || '',
+            order.status,
+            order.mod_verified ? 'Ja' : 'Nej',
+            new Date(order.created_at).toISOString()
+          ]] }
+        });
+      }
+    }
 
     console.log(`Synced ${orders.length} orders to Google Sheets`);
   } catch (error) {

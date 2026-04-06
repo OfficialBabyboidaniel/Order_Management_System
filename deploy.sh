@@ -9,7 +9,7 @@ echo "🚀 Starting Order Management System deployment..."
 
 # Check if we're in the right directory
 if [ ! -f "docker-compose.yml" ]; then
-    echo "❌ Error: docker-compose.yml not found. Are you in the Order_Management_System directory?"
+    echo "❌ Error: docker compose.yml not found. Are you in the Order_Management_System directory?"
     exit 1
 fi
 
@@ -37,11 +37,11 @@ fi
 
 # Stop existing containers
 echo "🛑 Stopping existing containers..."
-docker-compose down
+docker compose down
 
 # Build and start services
 echo "🏗️  Building and starting services..."
-docker-compose up -d --build
+docker compose up -d --build
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to start..."
@@ -49,12 +49,12 @@ sleep 10
 
 # Check service status
 echo "📊 Checking service status..."
-docker-compose ps
+docker compose ps
 
 # Show logs
 echo ""
 echo "📝 Recent logs:"
-docker-compose logs --tail=20
+docker compose logs --tail=20
 
 echo ""
 echo "✅ Deployment complete!"
@@ -64,10 +64,10 @@ echo "   - PostgreSQL: localhost:5432"
 echo "   - Backend API: http://localhost:3000"
 echo ""
 echo "🔍 Useful commands:"
-echo "   - View logs: docker-compose logs -f"
-echo "   - Stop services: docker-compose down"
-echo "   - Restart: docker-compose restart"
-echo "   - Check status: docker-compose ps"
+echo "   - View logs: docker compose logs -f"
+echo "   - Stop services: docker compose down"
+echo "   - Restart: docker compose restart"
+echo "   - Check status: docker compose ps"
 echo ""
 echo "📖 Next steps:"
 echo "   1. Test API: curl http://localhost:3000/api/orders"
